@@ -1,13 +1,11 @@
 import { Link } from "react-router";
 import { useState, type FormEvent } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { AuthErrorCodes, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router";
 
 import { Input } from "../../components/input";
 import { auth } from "../../services/firebaseConnection";
-
-// TODO: Implementar ReactToastify para exibir toasts de sucesso e erro.
-// TODO: Melhorar os tratamentos de erro das funcoes assincronas.
+import toast, { Toaster } from "react-hot-toast";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -19,22 +17,29 @@ export function Login() {
     e.preventDefault();
 
     if (email === "" || password === "") {
-      alert("Preencha todos os campos!");
-      return;
+      return toast.error("Preencha todos os campos");
     }
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
       navigate("/admin", { replace: true });
+
+      return toast.success("Logado com sucesso!");
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.log({ error: err, errorMessage: err.message });
+      if (
+        err instanceof Error &&
+        err.message.includes(AuthErrorCodes.INVALID_LOGIN_CREDENTIALS)
+      ) {
+        return toast.error("E-mail ou senha inválidos");
       }
     }
   }
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <Link to="/">
         <h1 className="mt-11 text-white mb-7 font-bold text-5xl">
           Dev

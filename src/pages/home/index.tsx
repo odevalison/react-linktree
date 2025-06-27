@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { type LinkProps } from "../admin";
 import { Social } from "../../components/social";
 import { db } from "../../services/firebaseConnection";
+import toast, { Toaster } from "react-hot-toast";
 
 interface SocialLinksProps {
   facebook: string;
@@ -45,10 +46,10 @@ export function Home() {
         });
       } catch (err: unknown) {
         if (err instanceof Error) {
-          console.error(`ERRO: ${err.message}`);
+          return toast.error("Erro ao carregar seus links salvos");
         }
 
-        console.error(`ERRO DESCONHECIDO: ${err}`);
+        return toast.error("Erro inesperado ao carregar seus links salvos");
       }
     }
 
@@ -73,10 +74,10 @@ export function Home() {
         });
       } catch (err: unknown) {
         if (err instanceof Error) {
-          console.error(`ERRO: ${err.message}}`);
+          return toast.error("Erro ao carregar os links sociais");
         }
 
-        console.error(`ERRO DESCONHECIDO: ${err}`);
+        return toast.error("Erro inesperado ao carregar os links sociais");
       }
     }
 
@@ -85,6 +86,8 @@ export function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full py-4">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <h1 className="md:text-4xl text-3xl font-bold text-white mt-20">
         Dev Alison
       </h1>

@@ -10,15 +10,13 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
+import toast, { Toaster } from "react-hot-toast";
 
 import { Input } from "../../components/input";
 
 import { db } from "../../services/firebaseConnection";
 
 // TODO: Criar funcionalidade de modal para editar os links (url, nome e cor).
-// TODO: Melhorar os tratamentos de erros das buscas no banco.
-// TODO: Implementar ReactToastify para exibir toasts de link sucesso e erro.
-// TODO: Trocar linkURL de state para ref.
 
 export interface LinkProps {
   id: string;
@@ -65,8 +63,7 @@ export function Admin() {
     e.preventDefault();
 
     if (!linkName || !linkUrl) {
-      alert("Preencha todos os campos!");
-      return;
+      return toast.error("Preencha todos os campos");
     }
 
     try {
@@ -82,13 +79,14 @@ export function Admin() {
       setLinkUrl("");
       setLinkBgColor(defaultBg);
       setLinkTextColor(defaultTextColor);
+
+      return toast.success("Link criado com sucesso!");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(`ERRO: ${err.message}`);
-        return;
+        return toast.error("Erro ao cadastrar link, tente novamente");
       }
 
-      console.error(`ERRO INESPERADO: ${err}`);
+      return toast.error("Erro inesperado, tente novamente");
     }
   }
 
@@ -97,17 +95,20 @@ export function Admin() {
 
     try {
       await deleteDoc(docRef);
+      return toast.success("Link deletado com sucesso!");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(`ERRO: ${err.message}`);
+        return toast.error("Erro ao excluir link, tente novamente");
       }
 
-      console.log(`ERRO INESPERADO: ${err}`);
+      return toast.error("Erro inesperado, tente novamente");
     }
   }
 
   return (
     <div className="h-screen flex flex-col items-center pb-7 px-2">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <form
         className="w-full max-w-xl flex flex-col mt-8 mb-3"
         onSubmit={handleRegister}

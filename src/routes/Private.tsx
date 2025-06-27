@@ -3,6 +3,7 @@ import { Navigate } from "react-router";
 import { onAuthStateChanged } from "firebase/auth";
 
 import { auth } from "../services/firebaseConnection";
+import toast from "react-hot-toast";
 
 interface PrivateProps {
   children: ReactNode;
@@ -34,10 +35,9 @@ export function Private({ children }: PrivateProps) {
   }, []);
 
   if (loading) {
-    // TODO Pesquisar e implementar um loading aqui.
     return <></>;
   } else if (!signed) {
-    // TODO Implementar Toastify de erro aqui.
+    toast.error("Acesso negado!");
     return <Navigate to="/login" />;
   }
 

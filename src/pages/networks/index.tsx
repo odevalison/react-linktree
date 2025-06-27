@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { setDoc, addDoc, getDoc, doc } from "firebase/firestore";
+import { setDoc, getDoc, doc } from "firebase/firestore";
 import { MdInsertLink } from "react-icons/md";
 
 import { Input } from "../../components/input";
 
 import { db } from "../../services/firebaseConnection";
+import toast, { Toaster } from "react-hot-toast";
 
 // TODO Melhorar tratamento de erro da funcao assincrona
 // TODO Revisar funcoes firebase (addDoc, setDoc, etc...)
@@ -51,18 +52,19 @@ export function Networks() {
         instagram: instagramUrl,
         youtube: youtubeUrl,
       });
+
+      return toast.success("Link salvo com sucesso!");
     } catch (err) {
       if (err instanceof Error) {
-        console.log(`ERRO: ${err.message}`);
-        return;
+        return toast.error("Erro ao salvar link social, tente novamente");
       }
-
-      console.log(`ERRO INESPERADO: ${err}`);
     }
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center pb-7 px-2">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <h1 className="text-white text-2xl font-semibold mt-8 mb-4">
         Suas redes sociais
       </h1>
