@@ -20,7 +20,7 @@ import { db } from "../../services/firebaseConnection";
 // TODO: Implementar ReactToastify para exibir toasts de link sucesso e erro.
 // TODO: Trocar linkURL de state para ref.
 
-interface LinkProps {
+export interface LinkProps {
   id: string;
   name: string;
   url: string;
