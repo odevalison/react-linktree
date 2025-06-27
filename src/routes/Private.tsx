@@ -14,14 +14,14 @@ export function Private({ children }: PrivateProps) {
   const [signed, setSigned] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userData = {
           uid: user?.uid,
           email: user?.email,
         };
 
-        localStorage.setItem("@ReactDevLinks", JSON.stringify(userData));
+        localStorage.setItem("reactLinkTree", JSON.stringify(userData));
 
         setSigned(true);
         setLoading(false);
@@ -31,7 +31,7 @@ export function Private({ children }: PrivateProps) {
       }
     });
 
-    return () => unsubscribe(); // Cleanup function
+    return () => unsub();
   }, []);
 
   if (loading) {

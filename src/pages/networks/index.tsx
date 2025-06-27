@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 // TODO Melhorar tratamento de erro da funcao assincrona
 // TODO Revisar funcoes firebase (addDoc, setDoc, etc...)
 // TODO Implementar sistema de adicionar novas redes sociais (admin)
+// TODO Criar component button
 
 export function Networks() {
   const [facebookUrl, setFacebookUrl] = useState("");
@@ -65,7 +66,7 @@ export function Networks() {
     <div className="min-h-screen flex flex-col items-center pb-7 px-2">
       <Toaster position="top-right" reverseOrder={false} />
 
-      <h1 className="text-white text-2xl font-semibold mt-8 mb-4">
+      <h1 className="text-white text-4xl font-semibold mt-8 mb-4">
         Suas redes sociais
       </h1>
 
@@ -100,7 +101,7 @@ export function Networks() {
 
         <button
           type="submit"
-          className="text-white bg-blue-600 h-9 rounded-md flex items-center justify-center gap-2 mb-7 font-medium cursor-pointer"
+          className="max-w-[600px] h-9 text-white bg-blue-600 rounded-md flex items-center justify-center gap-[7px] mb-7 font-medium cursor-pointer"
         >
           Salvar links
           <MdInsertLink size={24} color="#fff" />

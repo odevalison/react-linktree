@@ -1,13 +1,13 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { FiTrash } from "react-icons/fi";
 import { MdInsertLink } from "react-icons/md";
 import {
   addDoc,
   collection,
-  onSnapshot,
   query,
   orderBy,
   doc,
+  getDocs,
   deleteDoc,
 } from "firebase/firestore";
 import toast, { Toaster } from "react-hot-toast";
@@ -27,57 +27,77 @@ export interface LinkProps {
 }
 
 export function Admin() {
-  const defaultBg = "#121212";
+  // config vars
+  const defaultBgColor = "#121212";
   const defaultTextColor = "#f1f1f1";
 
-  const [linkBgColor, setLinkBgColor] = useState(defaultBg);
+  // refs
+  const linkUrlRef = useRef<HTMLInputElement>(null);
+
+  // states
+  const [linkBgColor, setLinkBgColor] = useState(defaultBgColor);
   const [linkTextColor, setLinkTextColor] = useState(defaultTextColor);
   const [linkName, setLinkName] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
   const [myLinks, setMyLinks] = useState<LinkProps[]>([]);
 
   useEffect(() => {
-    const linksRef = collection(db, "links");
-    const queryRef = query(linksRef, orderBy("createdAt", "asc"));
+    async function loadMyLinks() {
+      const linksRef = collection(db, "links");
+      const queryRef = query(linksRef, orderBy("createdAt", "asc"));
 
-    const unsub = onSnapshot(queryRef, (snapshot) => {
-      const list = [] as LinkProps[];
+      try {
+        const snapshot = await getDocs(queryRef);
+        const myLinksList = [] as LinkProps[];
 
-      snapshot.forEach((doc) => {
-        list.push({
-          id: doc.id,
-          name: doc.data().name,
-          url: doc.data().url,
-          bgColor: doc.data().bgColor,
-          textColor: doc.data().textColor,
+        snapshot.forEach((doc) => {
+          myLinksList.push({
+            id: doc.id,
+            name: doc.data().name,
+            url: doc.data().url,
+            bgColor: doc.data().bgColor,
+            textColor: doc.data().textColor,
+          });
         });
-      });
 
-      setMyLinks(list);
-    });
+        setMyLinks(myLinksList);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          return toast.error("Erro ao buscar links");
+        }
 
-    return () => unsub();
-  });
+        return toast.error(
+          "Erro inesperado, recarregue a página e tente novamente"
+        );
+      }
+    }
+
+    loadMyLinks();
+  }, []);
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
 
-    if (!linkName || !linkUrl) {
+    if (!linkName || !linkUrlRef.current?.value) {
       return toast.error("Preencha todos os campos");
     }
 
     try {
       await addDoc(collection(db, "links"), {
         name: linkName,
-        url: linkUrl,
+        url: linkUrlRef.current?.value,
         bgColor: linkBgColor,
         textColor: linkTextColor,
         createdAt: new Date(),
       });
 
+      // redefine o valor da ref (valor do input de url)
+      if (linkUrlRef.current?.value) {
+        linkUrlRef.current.value = "";
+      }
+
+      // redefine os valores dos states
       setLinkName("");
-      setLinkUrl("");
-      setLinkBgColor(defaultBg);
+      setLinkBgColor(defaultBgColor);
       setLinkTextColor(defaultTextColor);
 
       return toast.success("Link criado com sucesso!");
@@ -106,60 +126,55 @@ export function Admin() {
   }
 
   return (
-    <div className="h-screen flex flex-col items-center pb-7 px-2">
+    <div className="h-screen flex flex-col items-center pb-7 px-3">
       <Toaster position="top-right" reverseOrder={false} />
 
       <form
         className="w-full max-w-xl flex flex-col mt-8 mb-3"
         onSubmit={handleRegister}
       >
-        <label className="text-white font-medium my-2">Nome do link</label>
+        <label className="text-white font-medium mt-2 mb-1">Nome do link</label>
         <Input
           placeholder="Digite o nome do link"
           value={linkName}
           onChange={(e) => setLinkName(e.target.value)}
         />
 
-        <label className="text-white font-medium my-2">URL do link</label>
-        <Input
-          placeholder="Digite a URL do link"
-          type="url"
-          value={linkUrl}
-          onChange={(e) => setLinkUrl(e.target.value)}
-        />
+        <label className="text-white font-medium mt-2 mb-1">URL do link</label>
+        <Input placeholder="Digite a URL do link" type="url" ref={linkUrlRef} />
 
-        <section className="flex items-center gap-5 my-5 not-md:justify-center">
+        <section className="flex items-center gap-5 my-5">
           <div className="flex items-center gap-3">
-            <label className="text-white font-medium my-2">Fundo do link</label>
+            <label className="text-white font-medium">Cor de fundo</label>
 
             <input
               type="color"
               value={linkBgColor}
               onChange={(e) => setLinkBgColor(e.target.value)}
-              className="border-0 h-10 w-10 rounded-4xl px-[1px] bg-[#D9D9D9] color-swatch-4xl"
+              className="appearance-none cursor-pointer border-0 h-10 w-14 rounded px-[1px] bg-[#D9D9D9] color-swatch-sm"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="text-white font-medium my-2">Cor do link</label>
+            <label className="text-white font-medium">Cor do texto</label>
 
             <input
               type="color"
               value={linkTextColor}
               onChange={(e) => setLinkTextColor(e.target.value)}
-              className="border-0 h-10 w-10 rounded-4xl px-[1px] bg-[#D9D9D9] color-swatch-4xl"
+              className="appearence-none border-0 h-10 w-14 rounded px-[1px] bg-[#D9D9D9] color-swatch-sm"
             />
           </div>
         </section>
 
         {linkName && (
-          <div className="flex flex-col items-center justify-center mb-7 p-1 border-gray-100/25 border rounded-md">
+          <div className="flex flex-col items-center justify-center mb-7 p-1 border-gray-100/25 border rounded-md px-3">
             <label className="text-white font-medium mt-2 mb-3">
               Veja como está ficando:
             </label>
 
             <article
-              className="w-11/12 max-w-lg flex flex-col items-center justify-between bg-zinc-900 rounded px-1 py-3"
+              className="w-full max-w-xl flex flex-col items-center justify-between bg-zinc-900 rounded px-1 py-3"
               style={{ marginBlock: 8, backgroundColor: linkBgColor }}
             >
               <p className="font-medium" style={{ color: linkTextColor }}>
@@ -171,7 +186,7 @@ export function Admin() {
 
         <button
           type="submit"
-          className="bg-blue-600 h-9 rounded-md text-white font-medium gap-2 flex items-center justify-center mb-7 cursor-pointer"
+          className="h-9 bg-blue-600 rounded-md text-white font-medium gap-2 flex items-center justify-center mb-7 cursor-pointer"
         >
           Cadastrar <MdInsertLink size={24} color="#fff" />
         </button>
@@ -183,7 +198,7 @@ export function Admin() {
 
       {myLinks.map((link) => (
         <article
-          className="flex items-center justify-between w-full max-w-xl rounded py-2 px-3 mb-2 select-none"
+          className="w-full max-w-2xl flex items-center justify-between rounded py-2 px-3 mb-2 select-none"
           style={{ backgroundColor: link.bgColor, color: link.textColor }}
           key={link.id}
         >
