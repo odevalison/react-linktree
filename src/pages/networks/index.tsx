@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { setDoc, addDoc, getDoc, doc } from "firebase/firestore";
 import { MdInsertLink } from "react-icons/md";
 
@@ -14,6 +14,33 @@ export function Networks() {
   const [facebookUrl, setFacebookUrl] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+
+  useEffect(() => {
+    async function loadLinks() {
+      const docRef = doc(db, "social", "link");
+
+      try {
+        const snapshot = await getDoc(docRef);
+
+        // se nao tiver nada, para a execucao da funcao.
+        if (snapshot.data() === undefined) {
+          return;
+        }
+
+        setFacebookUrl(snapshot.data()?.facebook);
+        setInstagramUrl(snapshot.data()?.instagram);
+        setYoutubeUrl(snapshot.data()?.youtube);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(`ERRO: ${err.message}`);
+        }
+
+        console.error(`ERRO INESPERADO: ${err}`);
+      }
+    }
+
+    loadLinks();
+  }, []);
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();

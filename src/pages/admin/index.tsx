@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { FiLink, FiTrash } from "react-icons/fi";
+import { FiTrash } from "react-icons/fi";
 import { MdInsertLink } from "react-icons/md";
 import {
   addDoc,
@@ -18,6 +18,7 @@ import { db } from "../../services/firebaseConnection";
 // TODO: Criar funcionalidade de modal para editar os links (url, nome e cor).
 // TODO: Melhorar os tratamentos de erros das buscas no banco.
 // TODO: Implementar ReactToastify para exibir toasts de link sucesso e erro.
+// TODO: Trocar linkURL de state para ref.
 
 interface LinkProps {
   id: string;
@@ -41,7 +42,7 @@ export function Admin() {
     const linksRef = collection(db, "links");
     const queryRef = query(linksRef, orderBy("createdAt", "asc"));
 
-    const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+    const unsub = onSnapshot(queryRef, (snapshot) => {
       const list = [] as LinkProps[];
 
       snapshot.forEach((doc) => {
@@ -57,7 +58,7 @@ export function Admin() {
       setMyLinks(list);
     });
 
-    return () => unsubscribe();
+    return () => unsub();
   });
 
   async function handleRegister(e: FormEvent) {
