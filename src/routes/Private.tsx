@@ -13,7 +13,7 @@ export function Private({ children }: PrivateProps) {
   const [signed, setSigned] = useState(false);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userData = {
           uid: user?.uid,
@@ -30,7 +30,7 @@ export function Private({ children }: PrivateProps) {
       }
     });
 
-    return () => unsub();
+    return () => unsubscribe(); // Cleanup function
   }, []);
 
   if (loading) {

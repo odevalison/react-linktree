@@ -4,6 +4,8 @@ import { signOut } from "firebase/auth";
 
 import { auth } from "../../services/firebaseConnection";
 
+// TODO: Melhorar tratamento de erros da funcao de logout
+
 export function Header() {
   async function handleLogOut() {
     try {
@@ -16,7 +18,7 @@ export function Header() {
   }
 
   return (
-    <header className="w-full max-w-2xl mt-4 px-1">
+    <header className="w-full my-0 mx-auto max-w-2xl mt-4 px-1">
       <nav className="w-full bg-white h-12 flex items-center gap-6 rounded-md px-3">
         <button onClick={handleLogOut}>
           <BiLogOut size={30} color="#db2629" className="cursor-pointer" />

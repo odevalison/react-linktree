@@ -6,6 +6,9 @@ import { useNavigate } from "react-router";
 import { Input } from "../../components/input";
 import { auth } from "../../services/firebaseConnection";
 
+// TODO: Implementar ReactToastify para exibir toasts de sucesso e erro.
+// TODO: Melhorar os tratamentos de erro das funcoes assincronas.
+
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +19,6 @@ export function Login() {
     e.preventDefault();
 
     if (email === "" || password === "") {
-      // TODO Implementar Toastify aqui
       alert("Preencha todos os campos!");
       return;
     }
@@ -25,7 +27,6 @@ export function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/admin", { replace: true });
     } catch (err: unknown) {
-      // TODO Capturar e exibir erros de forma melhor
       if (err instanceof Error) {
         console.log({ error: err, errorMessage: err.message });
       }
