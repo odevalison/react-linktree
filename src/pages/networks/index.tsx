@@ -6,6 +6,7 @@ import { Input } from "../../components/input";
 
 import { db } from "../../services/firebaseConnection";
 import toast, { Toaster } from "react-hot-toast";
+import { Header } from "../../components/header";
 
 // TODO Melhorar tratamento de erro da funcao assincrona
 // TODO Revisar funcoes firebase (addDoc, setDoc, etc...)
@@ -66,7 +67,9 @@ export function Networks() {
     <div className="min-h-screen flex flex-col items-center pb-7 px-2">
       <Toaster position="top-right" reverseOrder={false} />
 
-      <h1 className="text-white text-4xl font-semibold mt-8 mb-4">
+      <Header />
+
+      <h1 className="text-white text-2xl font-semibold mt-8 mb-4">
         Suas redes sociais
       </h1>
 

@@ -7,8 +7,8 @@ import {
   query,
   orderBy,
   doc,
-  getDocs,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -16,9 +16,10 @@ import { Input } from "../../components/input";
 
 import { db } from "../../services/firebaseConnection";
 import { Button } from "../../components/button";
+import { ColorPicker } from "../../components/color-picker";
+import { Header } from "../../components/header";
 
 // TODO: Criar funcionalidade de modal para editar os links (url, nome e cor).
-// TODO: Criar component de PickColorsInput
 
 export interface LinkProps {
   id: string;
@@ -29,58 +30,49 @@ export interface LinkProps {
 }
 
 export function Admin() {
-  // config vars
   const defaultBgColor = "#121212";
   const defaultTextColor = "#f1f1f1";
 
-  // refs
   const linkUrlRef = useRef<HTMLInputElement>(null);
 
-  // states
   const [linkBgColor, setLinkBgColor] = useState(defaultBgColor);
   const [linkTextColor, setLinkTextColor] = useState(defaultTextColor);
   const [linkName, setLinkName] = useState("");
   const [myLinks, setMyLinks] = useState<LinkProps[]>([]);
 
   useEffect(() => {
-    async function loadMyLinks() {
-      const linksRef = collection(db, "links");
-      const queryRef = query(linksRef, orderBy("createdAt", "asc"));
+    const linksRef = collection(db, "links");
+    const queryRef = query(linksRef, orderBy("createdAt", "desc"));
 
-      try {
-        const snapshot = await getDocs(queryRef);
-        const myLinksList = [] as LinkProps[];
+    const unsub = onSnapshot(queryRef, (snapshot) => {
+      const myLinksList: LinkProps[] = [];
 
-        snapshot.forEach((doc) => {
-          myLinksList.push({
-            id: doc.id,
-            name: doc.data().name,
-            url: doc.data().url,
-            bgColor: doc.data().bgColor,
-            textColor: doc.data().textColor,
-          });
+      snapshot.forEach((doc) => {
+        myLinksList.push({
+          id: doc.id,
+          name: doc.data().name,
+          url: doc.data().url,
+          bgColor: doc.data().bgColor,
+          textColor: doc.data().textColor,
         });
+      });
 
-        setMyLinks(myLinksList);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          return toast.error("Erro ao buscar links");
-        }
+      setMyLinks(myLinksList);
+    });
 
-        return toast.error(
-          "Erro inesperado, recarregue a página e tente novamente"
-        );
-      }
-    }
-
-    loadMyLinks();
+    return () => unsub();
   }, []);
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
 
-    if (!linkName || !linkUrlRef.current?.value) {
+    // Verificacao dos campos
+    if (!linkName && !linkUrlRef.current?.value) {
       return toast.error("Preencha todos os campos");
+    } else if (linkName && !linkUrlRef.current?.value) {
+      return toast.error("Preencha a URL do link");
+    } else if (!linkName && linkUrlRef.current?.value) {
+      return toast.error("Preencha o nome do link");
     }
 
     try {
@@ -128,8 +120,10 @@ export function Admin() {
   }
 
   return (
-    <div className="h-screen flex flex-col items-center pb-7 px-3">
+    <div className="h-screen flex flex-col items-center pb-7 px-2">
       <Toaster position="top-right" reverseOrder={false} />
+
+      <Header />
 
       <form
         className="w-full max-w-xl flex flex-col mt-8 mb-3"
@@ -138,43 +132,42 @@ export function Admin() {
         <label className="text-white font-medium mt-2 mb-1">Nome do link</label>
         <Input
           placeholder="Digite o nome do link"
-          value={linkName}
           onChange={(e) => setLinkName(e.target.value)}
+          value={linkName}
         />
+
         <label className="text-white font-medium mt-2 mb-1">URL do link</label>
-        <Input placeholder="Digite a URL do link" type="url" ref={linkUrlRef} />
+        <Input type="url" placeholder="Digite a URL do link" ref={linkUrlRef} />
+
         <section className="flex items-center gap-5 my-5">
           <div className="flex items-center gap-3">
             <label className="text-white font-medium">Cor de fundo</label>
 
-            <input
-              type="color"
+            <ColorPicker
               value={linkBgColor}
               onChange={(e) => setLinkBgColor(e.target.value)}
-              className="appearance-none cursor-pointer border-0 h-10 w-14 rounded px-[1px] bg-[#D9D9D9] color-swatch-sm"
             />
           </div>
 
           <div className="flex items-center gap-3">
             <label className="text-white font-medium">Cor do texto</label>
 
-            <input
-              type="color"
+            <ColorPicker
               value={linkTextColor}
               onChange={(e) => setLinkTextColor(e.target.value)}
-              className="appearence-none border-0 h-10 w-14 rounded px-[1px] bg-[#D9D9D9] color-swatch-sm"
             />
           </div>
         </section>
+
         {linkName && (
-          <div className="flex flex-col items-center justify-center mb-7 p-1 border-gray-100/25 border rounded-md px-3">
-            <label className="text-white font-medium mt-2 mb-3">
-              Veja como está ficando:
+          <div className="flex flex-col items-center justify-center mb-7 p-1 border-gray-100/25 border rounded-md">
+            <label className="text-white font-medium my-2">
+              Veja como está ficando seu link 👇
             </label>
 
             <article
-              className="w-full max-w-xl flex flex-col items-center justify-between bg-zinc-900 rounded px-1 py-3"
-              style={{ marginBlock: 8, backgroundColor: linkBgColor }}
+              className="w-11/12 max-w-lg flex flex-col items-center justify-between rounded px-1 py-3 my-2"
+              style={{ backgroundColor: linkBgColor }}
             >
               <p className="font-medium" style={{ color: linkTextColor }}>
                 {linkName}
@@ -182,18 +175,18 @@ export function Admin() {
             </article>
           </div>
         )}
+
         <Button type="submit">
-          Cadastrar <MdInsertLink size={24} color="#fff" />
+          Cadastrar
+          <MdInsertLink size={24} color="#fff" />
         </Button>
       </form>
 
-      {myLinks.length > 0 && (
-        <h2 className="font-bold text-white mb-4 text-2xl">Meus Links</h2>
-      )}
+      <h2 className="font-bold text-white mb-4 text-2xl">Meus Links</h2>
 
       {myLinks.map((link) => (
         <article
-          className="w-full max-w-2xl flex items-center justify-between rounded py-2 px-3 mb-2 select-none"
+          className="w-11/12 max-w-xl flex items-center justify-between rounded p-3 mb-2 select-none"
           style={{ backgroundColor: link.bgColor, color: link.textColor }}
           key={link.id}
         >
