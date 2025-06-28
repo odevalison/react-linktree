@@ -15,8 +15,10 @@ import toast, { Toaster } from "react-hot-toast";
 import { Input } from "../../components/input";
 
 import { db } from "../../services/firebaseConnection";
+import { Button } from "../../components/button";
 
 // TODO: Criar funcionalidade de modal para editar os links (url, nome e cor).
+// TODO: Criar component de PickColorsInput
 
 export interface LinkProps {
   id: string;
@@ -139,10 +141,8 @@ export function Admin() {
           value={linkName}
           onChange={(e) => setLinkName(e.target.value)}
         />
-
         <label className="text-white font-medium mt-2 mb-1">URL do link</label>
         <Input placeholder="Digite a URL do link" type="url" ref={linkUrlRef} />
-
         <section className="flex items-center gap-5 my-5">
           <div className="flex items-center gap-3">
             <label className="text-white font-medium">Cor de fundo</label>
@@ -166,7 +166,6 @@ export function Admin() {
             />
           </div>
         </section>
-
         {linkName && (
           <div className="flex flex-col items-center justify-center mb-7 p-1 border-gray-100/25 border rounded-md px-3">
             <label className="text-white font-medium mt-2 mb-3">
@@ -183,13 +182,9 @@ export function Admin() {
             </article>
           </div>
         )}
-
-        <button
-          type="submit"
-          className="h-9 bg-blue-600 rounded-md text-white font-medium gap-2 flex items-center justify-center mb-7 cursor-pointer"
-        >
+        <Button type="submit">
           Cadastrar <MdInsertLink size={24} color="#fff" />
-        </button>
+        </Button>
       </form>
 
       {myLinks.length > 0 && (
