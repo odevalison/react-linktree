@@ -89,7 +89,7 @@ export const Home = () => {
       <Toaster position="top-right" reverseOrder={false} />
 
       <h1 className="md:text-4xl text-3xl font-bold text-white mt-20">
-        Dev Alison
+        Alison | Dev Web
       </h1>
 
       <span className="text-gray-50 mb-5 mt-3">Conheça meus links 👇</span>
