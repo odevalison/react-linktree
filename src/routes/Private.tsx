@@ -3,13 +3,12 @@ import { Navigate } from "react-router";
 import { onAuthStateChanged } from "firebase/auth";
 
 import { auth } from "../services/firebaseConnection";
-import toast from "react-hot-toast";
 
 interface PrivateProps {
   children: ReactNode;
 }
 
-export function Private({ children }: PrivateProps) {
+export const Private = ({ children }: PrivateProps) => {
   const [loading, setLoading] = useState(true);
   const [signed, setSigned] = useState(false);
 
@@ -37,9 +36,8 @@ export function Private({ children }: PrivateProps) {
   if (loading) {
     return <></>;
   } else if (!signed) {
-    toast.error("Acesso negado!");
     return <Navigate to="/login" />;
   }
 
   return children;
-}
+};

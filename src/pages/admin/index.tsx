@@ -29,7 +29,7 @@ export interface LinkProps {
   textColor: string;
 }
 
-export function Admin() {
+export const Admin = () => {
   const defaultBgColor = "#121212";
   const defaultTextColor = "#f1f1f1";
 
@@ -63,7 +63,7 @@ export function Admin() {
     return () => unsub();
   }, []);
 
-  async function handleRegister(e: FormEvent) {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
 
     // Verificacao dos campos
@@ -102,9 +102,9 @@ export function Admin() {
 
       return toast.error("Erro inesperado, tente novamente");
     }
-  }
+  };
 
-  async function handleDeleteLink(linkId: string) {
+  const handleDeleteLink = async (linkId: string) => {
     const docRef = doc(db, "links", linkId);
 
     try {
@@ -117,7 +117,7 @@ export function Admin() {
 
       return toast.error("Erro inesperado, tente novamente");
     }
-  }
+  };
 
   return (
     <div className="h-screen flex flex-col items-center pb-7 px-2">
@@ -203,4 +203,4 @@ export function Admin() {
       ))}
     </div>
   );
-}
+};

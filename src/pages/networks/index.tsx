@@ -13,13 +13,13 @@ import { Header } from "../../components/header";
 // TODO Implementar sistema de adicionar novas redes sociais (admin)
 // TODO Criar component button
 
-export function Networks() {
+export const Networks = () => {
   const [facebookUrl, setFacebookUrl] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
 
   useEffect(() => {
-    async function loadLinks() {
+    const loadLinks = async () => {
       const docRef = doc(db, "social", "link");
 
       try {
@@ -40,12 +40,12 @@ export function Networks() {
 
         console.error(`ERRO INESPERADO: ${err}`);
       }
-    }
+    };
 
     loadLinks();
   }, []);
 
-  async function handleRegister(e: FormEvent) {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
@@ -61,7 +61,7 @@ export function Networks() {
         return toast.error("Erro ao salvar link social, tente novamente");
       }
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center pb-7 px-2">
@@ -112,4 +112,4 @@ export function Networks() {
       </form>
     </div>
   );
-}
+};

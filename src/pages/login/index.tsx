@@ -8,12 +8,12 @@ import { auth } from "../../services/firebaseConnection";
 import toast, { Toaster } from "react-hot-toast";
 
 export function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate();
-
-  async function handleSubmit(e: FormEvent) {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (email === "" || password === "") {
@@ -34,7 +34,7 @@ export function Login() {
         return toast.error("E-mail ou senha inválidos");
       }
     }
-  }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center">

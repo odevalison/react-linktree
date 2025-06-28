@@ -20,12 +20,12 @@ interface SocialLinksProps {
   youtube: string;
 }
 
-export function Home() {
+export const Home = () => {
   const [savedLinks, setSavedLinks] = useState<LinkProps[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLinksProps>();
 
   useEffect(() => {
-    async function loadLinks() {
+    const loadLinks = async () => {
       const linksRef = collection(db, "links");
       const queryRef = query(linksRef, orderBy("createdAt", "asc"));
 
@@ -51,7 +51,7 @@ export function Home() {
 
         return toast.error("Erro inesperado ao carregar seus links salvos");
       }
-    }
+    };
 
     loadLinks();
   }, []);
@@ -128,4 +128,4 @@ export function Home() {
       </main>
     </div>
   );
-}
+};
